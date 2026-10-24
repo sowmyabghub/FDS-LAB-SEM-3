@@ -1,0 +1,79 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Read CSV safely
+df = pd.read_csv("sales_data.csv", delimiter=",", on_bad_lines="skip")
+
+# --- Dataset Preview ---
+print("\n--- First 5 Rows ---")
+print(df.head())
+
+print("\n--- Column Names ---")
+print(df.columns)
+
+# --- Plot Sales Over Time ---
+if "Sales" in df.columns and "Date" in df.columns:
+    plt.figure(figsize=(8, 6))
+    plt.plot(df["Date"], df["Sales"], marker="o")
+    plt.title("Sales Over Time")
+    plt.xlabel("Date")
+    plt.ylabel("Sales")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+elif "Sales" in df.columns:
+    plt.figure(figsize=(8, 6))
+    plt.plot(df.index, df["Sales"], marker="o")
+    plt.title("Sales Over Time (by row index)")
+    plt.xlabel("Row Index")
+    plt.ylabel("Sales")
+    plt.tight_layout()
+    plt.show()
+else:
+    print("\n⚠️ No 'Sales' column found in the dataset.")
+
+# --- Pivot Table ---
+if "Sales" in df.columns and "Region" in df.columns and "Product" in df.columns:
+    pivot_table = df.pivot_table(
+        values="Sales",
+        index="Region",
+        columns="Product",
+        aggfunc=np.sum,
+        fill_value=0
+    )
+    print("\n--- Pivot Table ---")
+    print(pivot_table)
+
+# --- Correlation Matrix ---
+correlation_matrix = df.select_dtypes(include=np.number).corr()
+print("\n--- Correlation Matrix ---")
+print(correlation_matrix)
+
+plt.figure(figsize=(8, 6))
+plt.imshow(correlation_matrix, cmap="coolwarm", interpolation="nearest")
+plt.colorbar()
+plt.title("Correlation Heatmap")
+plt.show()
+
+# --- Summary Statistics ---
+if "Sales" in df.columns:
+    print("\n--- Sales Summary ---")
+    print(df["Sales"].describe())
+
+if "Quantity" in df.columns:
+    print("\n--- Quantity Summary ---")
+    print(df["Quantity"].describe())
+
+# --- Total Sales by Product ---
+if "Sales" in df.columns and "Product" in df.columns and "Quantity" in df.columns:
+    total_sales = df.groupby("Product")[["Sales", "Quantity"]].sum().reset_index()
+    print("\n--- Total Sales by Product ---")
+    print(total_sales)
+
+    plt.figure(figsize=(8, 6))
+    plt.bar(total_sales["Product"], total_sales["Sales"], color="skyblue")
+    plt.title("Total Sales by Product")
+    plt.xlabel("Product")
+    plt.ylabel("Total Sales")
+    plt.show()
