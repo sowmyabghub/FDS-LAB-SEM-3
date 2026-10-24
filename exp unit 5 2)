@@ -1,0 +1,75 @@
+
+# Experiment No: 18
+# Experiment to Understand KNN Algorithm
+
+import numpy as np
+import pandas as pd
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, classification_report
+
+# Load Iris dataset
+iris = load_iris()
+
+df = pd.DataFrame(
+    iris.data,
+    columns=[
+        'sepal.length',
+        'sepal.width',
+        'petal.length',
+        'petal.width'
+    ]
+)
+
+df['variety'] = iris.target_names[iris.target]
+
+# Display dataset information
+print("Dataset Information:")
+df.info()
+
+# Display variety counts
+print("\nVariety Counts:")
+print(df['variety'].value_counts())
+
+# Display first five rows
+print("\nFirst Five Rows:")
+print(df.head())
+
+# Separate features and labels
+features = df.iloc[:, :-1].values
+label = df.iloc[:, 4].values
+
+# Split dataset into training and testing data
+xtrain, xtest, ytrain, ytest = train_test_split(
+    features,
+    label,
+    test_size=0.2,
+    random_state=42
+)
+
+# Create KNN model
+model_KNN = KNeighborsClassifier(n_neighbors=5)
+
+# Train the model
+model_KNN.fit(xtrain, ytrain)
+
+# Calculate accuracy
+print("\nTraining Accuracy:")
+print(model_KNN.score(xtrain, ytrain))
+
+print("\nTesting Accuracy:")
+print(model_KNN.score(xtest, ytest))
+
+# Confusion matrix for test data
+print("\nConfusion Matrix:")
+print(confusion_matrix(ytest, model_KNN.predict(xtest)))
+
+# Classification report for test data
+print("\nClassification Report:")
+print(classification_report(
+    ytest,
+    model_KNN.predict(xtest),
+    target_names=iris.target_names
+))
